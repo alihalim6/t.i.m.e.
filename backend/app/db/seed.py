@@ -6,6 +6,7 @@ from app.db.models import (
     PromptSnapshot,
     RatingTag,
     AppSetting,
+    Interest,
 )
 
 SEED_BASE_PROMPT = """<base_instructions>
@@ -72,6 +73,21 @@ SEED_APP_SETTINGS = [
     {"key": "max_items_per_email", "value": {"count": 10}},
 ]
 
+SEED_INTERESTS = [
+    {
+        "name": "AI Systems & Agents",
+        "prompt_text": "Deep technical articles, architectural breakdowns, research papers, and thoughtful essays on multi-agent systems, LLM evaluation, reasoning architectures, tool use, and cognitive agents. Avoid generic buzzword regurgitation, beginner tutorials, and promotional funding announcements.",
+    },
+    {
+        "name": "Mechanical Keyboards",
+        "prompt_text": "Custom mechanical keyboard builds, switch acoustics and materials, firmware developments (QMK/ZMK), ergonomic layout experiments, and keycap artisan craftsmanship. Focus on high-effort enthusiast reviews and open-source keyboard projects.",
+    },
+    {
+        "name": "Distributed Systems",
+        "prompt_text": "Engineering post-mortems, distributed consensus algorithms (Raft, Paxos), high-throughput messaging architectures, storage engines, and latency mitigation in large-scale backend infrastructure.",
+    },
+]
+
 async def seed_database(session: AsyncSession) -> None:
     # 1. Global Prompt
     result = await session.execute(select(GlobalPrompt).limit(1))
@@ -127,4 +143,19 @@ async def seed_database(session: AsyncSession) -> None:
         if not result.scalars().first():
             session.add(AppSetting(**setting))
 
+    # 6. Seed Interests if none exist
+    result = await session.execute(select(Interest).limit(1))
+    if not result.scalars().first():
+        for item in SEED_INTERESTS:
+            session.add(
+                Interest(
+                    name=item["name"],
+                    prompt_text=item["prompt_text"],
+                    draft_prompt_text=item["prompt_text"],
+                    has_draft_changes=False,
+                    is_active=True,
+                )
+            )
+
     await session.commit()
+

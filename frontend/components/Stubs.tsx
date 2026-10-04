@@ -155,7 +155,7 @@ export const SettingsTab: React.FC = () => {
   }, []);
 
   return (
-    <div className="stub-container" style={{ paddingTop: "24px" }}>
+    <div className="stub-container">
       {/* Stub Hero has been removed as requested */}
 
       {/* System Parameters Card */}

@@ -5,7 +5,8 @@
   --font-display: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-mono: 'JetBrains Mono', 'Fira Code', Menlo, monospace;
 
-  --sidebar-width: 250px;
+  /* Tab bar height */
+  --tab-bar-height: 42px;
   --radius-sm: 0px;
   --radius-md: 0px;
   --radius-lg: 0px;
@@ -115,14 +116,17 @@
 }
 
 /* Universal Reset: Strictly No Rounded Corners */
-*, *::before, *::after {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
   border-radius: 0 !important;
 }
 
-html, body {
+html,
+body {
   background-color: var(--bg-app);
   color: var(--text-main);
   font-family: var(--font-ui);
@@ -137,12 +141,15 @@ html, body {
   width: 6px;
   height: 6px;
 }
+
 ::-webkit-scrollbar-track {
   background: var(--bg-editor);
 }
+
 ::-webkit-scrollbar-thumb {
   background: var(--border-medium);
 }
+
 ::-webkit-scrollbar-thumb:hover {
   background: var(--border-bright);
 }
@@ -150,81 +157,112 @@ html, body {
 /* App Container */
 .app-container {
   display: flex;
+  flex-direction: column;
   height: 100vh;
   width: 100vw;
   overflow: hidden;
   background-color: var(--bg-app);
 }
 
-/* Vertical Sidebar */
-.sidebar {
-  width: var(--sidebar-width);
-  min-width: var(--sidebar-width);
-  height: 100%;
+/* ─── Horizontal Tab Bar ─────────────────────────────────────────────────────
+   Browser/terminal-style tab strip pinned to the top of the page.
+   ─────────────────────────────────────────────────────────────────────────── */
+.tab-bar {
+  height: var(--tab-bar-height);
+  min-height: var(--tab-bar-height);
+  display: flex;
+  align-items: stretch;
   background-color: var(--bg-sidebar);
-  border-right: 1px solid var(--border-subtle);
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
+  border-bottom: 1px solid var(--border-subtle);
   user-select: none;
-  z-index: 20;
+  z-index: 50;
+  flex-shrink: 0;
+  overflow: hidden;
 }
 
-/* Vertically Centered Sidebar Navigation */
-.sidebar-nav {
-  padding: 24px 14px;
+.tab-bar-nav {
+  display: flex;
+  align-items: stretch;
   flex: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 6px;
-  overflow-y: auto;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
 }
 
-.nav-item {
-  display: flex;
+.tab-bar-nav::-webkit-scrollbar {
+  display: none;
+}
+
+.tab-item {
+  display: inline-flex;
   align-items: center;
-  justify-content: space-between;
-  width: 100%;
-  padding: 11px 14px;
+  gap: 7px;
+  padding: 0 16px;
   background: transparent;
-  border: 1px solid transparent;
+  border: none;
+  border-right: 1px solid var(--border-subtle);
   color: var(--text-muted);
-  font-size: 13px;
+  font-family: var(--font-mono);
+  font-size: 12px;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.12s ease;
-  text-align: left;
+  transition: background 0.1s ease, color 0.1s ease;
+  white-space: nowrap;
+  position: relative;
   letter-spacing: 0.1px;
 }
 
-.nav-item:hover {
+.tab-item:hover {
   background: var(--nav-hover-bg);
   color: var(--text-main);
-  border-color: var(--border-subtle);
 }
 
-.nav-item.active {
-  background: var(--nav-active-bg);
-  color: var(--nav-active-text);
-  border-color: var(--nav-active-bg);
+.tab-item--active {
+  background: var(--bg-app);
+  color: var(--text-main);
   font-weight: 600;
 }
 
-.nav-label-group {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
 
-.nav-icon {
-  width: 17px;
-  height: 17px;
+.tab-icon {
+  width: 13px;
+  height: 13px;
   stroke-width: 2;
   flex-shrink: 0;
 }
 
-/* Orange Draft Square */
+.tab-label {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.tab-bar-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 16px;
+  border-left: 1px solid var(--border-subtle);
+  flex-shrink: 0;
+}
+
+.tab-bar-status-text {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-faint);
+}
+
+.tab-bar-version {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-faint);
+  padding-left: 8px;
+  border-left: 1px solid var(--border-subtle);
+}
+
+/* ─── Orange Draft Square ─────────────────────────────────────────────────── */
 .draft-dot {
   display: inline-block;
   width: 7px;
@@ -235,8 +273,17 @@ html, body {
 }
 
 @keyframes pulse-square {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.35; transform: scale(0.8); }
+
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 0.35;
+    transform: scale(0.8);
+  }
 }
 
 .stub-pill {
@@ -250,62 +297,26 @@ html, body {
   font-weight: 600;
 }
 
-.nav-item.active .stub-pill {
-  border-color: var(--nav-active-text);
-  background: transparent;
-  color: var(--nav-active-text);
-}
 
-.sidebar-footer {
-  padding: 16px 16px;
-  border-top: 1px solid var(--border-subtle);
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.status-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  font-size: 11px;
-  color: var(--text-faint);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.status-indicator {
-  display: flex;
-  align-items: center;
-  gap: 7px;
-}
-
-.status-bullet {
-  width: 6px;
-  height: 6px;
-  background-color: var(--border-bright);
-}
-
-.theme-toggle-btn {
-  width: 100%;
-  padding: 7px 10px;
-  background: transparent;
-  border: 1px solid var(--border-subtle);
-  color: var(--text-muted);
-  font-family: var(--font-ui);
-  font-size: 11px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.6px;
-  cursor: pointer;
-  transition: all 0.12s ease;
+/* ─── Fixed Bottom-Left Theme Toggle ──────────────────────────────────────── */
+.theme-toggle-fixed {
+  position: fixed;
+  bottom: 16px;
+  left: 16px;
+  width: 34px;
+  height: 34px;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  background: var(--bg-sidebar);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-muted);
+  cursor: pointer;
+  z-index: 200;
+  transition: background 0.12s ease, color 0.12s ease, border-color 0.12s ease;
 }
 
-.theme-toggle-btn:hover {
+.theme-toggle-fixed:hover {
   background: var(--nav-hover-bg);
   color: var(--text-main);
   border-color: var(--border-medium);
@@ -326,7 +337,7 @@ html, body {
   display: flex;
   flex-direction: column;
   height: 100%;
-  padding: 24px 32px;
+  padding: 24px 32px 72px 16px;
   overflow-y: auto;
   gap: 16px;
 }
@@ -472,6 +483,88 @@ html, body {
   border: 1px solid var(--border-medium);
 }
 
+/* Interests Horizontal Tab Bar */
+.interests-top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border-subtle);
+  overflow-x: auto;
+}
+
+.interests-tabs-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.interest-tab-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  font-weight: 600;
+  padding: 6px 12px;
+  background: var(--badge-bg);
+  color: var(--text-muted);
+  border: 1px solid var(--border-medium);
+  cursor: pointer;
+  transition: all 0.12s ease;
+  user-select: none;
+  white-space: nowrap;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.interest-tab-chip:hover {
+  color: var(--text-main);
+  border-color: var(--border-bright);
+}
+
+.interest-tab-chip.active {
+  background: var(--nav-active-bg);
+  color: var(--nav-active-text);
+  border-color: var(--nav-active-bg);
+}
+
+.interest-tab-chip.inactive {
+  opacity: 0.55;
+  border-style: dashed;
+}
+
+.interest-tab-chip.active.inactive {
+  opacity: 0.9;
+  border-style: dashed;
+}
+
+.btn-add-interest {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  font-weight: 700;
+  padding: 6px 14px;
+  background: transparent;
+  color: var(--text-main);
+  border: 1px solid var(--border-bright);
+  cursor: pointer;
+  transition: all 0.12s ease;
+  white-space: nowrap;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  flex-shrink: 0;
+}
+
+.btn-add-interest:hover {
+  background: var(--nav-active-bg);
+  color: var(--nav-active-text);
+}
+
 /* Code Editor Frame */
 .editor-frame {
   flex: 1;
@@ -558,11 +651,12 @@ html, body {
 
 /* Stubs & Preview Pages */
 .stub-container {
-  padding: 36px 40px;
+  padding: 24px 32px 24px 16px;
   display: flex;
   flex-direction: column;
   gap: 24px;
   max-width: 1000px;
+  overflow-y: auto;
 }
 
 .stub-hero {

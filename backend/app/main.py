@@ -4,6 +4,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.routes_prompts import router as prompts_router
+from app.api.routes_interests import router as interests_router
 from app.config import settings
 from app.db.models import Base
 from app.db.seed import seed_database
@@ -47,6 +48,7 @@ app.add_middleware(
 )
 
 app.include_router(prompts_router)
+app.include_router(interests_router)
 
 @app.get("/health")
 async def health_check():

@@ -6,24 +6,18 @@ import { useToast } from "./Toast";
 
 interface PromptEditorProps {
   type: "base" | "scoring";
-  title: string;
-  subtitle: string;
   promptData: PromptData | null;
   onSaveDraft: (draftText: string) => Promise<PromptData>;
   onDiscardDraft: () => Promise<PromptData>;
   onPublish: () => Promise<PublishResponse>;
-  placeholderChips: string[];
 }
 
 export const PromptEditor: React.FC<PromptEditorProps> = ({
   type,
-  title,
-  subtitle,
   promptData,
   onSaveDraft,
   onDiscardDraft,
   onPublish,
-  placeholderChips,
 }) => {
   const { showToast } = useToast();
 
@@ -140,7 +134,7 @@ export const PromptEditor: React.FC<PromptEditorProps> = ({
 
   const hasDraft = Boolean(
     promptData &&
-      (promptData.has_draft_changes || (content !== "" && content !== promptData.prompt_text))
+    (promptData.has_draft_changes || (content !== "" && content !== promptData.prompt_text))
   );
 
   return (
@@ -149,12 +143,6 @@ export const PromptEditor: React.FC<PromptEditorProps> = ({
       <div className="editor-header-bar">
         <div className="header-meta">
           <div className="header-title-row">
-            <h2>{title}</h2>
-            {promptData && (
-              <span className="version-badge" title="Published Version">
-                v{promptData.version}
-              </span>
-            )}
             {hasDraft && (
               <span className="draft-status-badge">
                 <span className="draft-dot" />
@@ -162,7 +150,6 @@ export const PromptEditor: React.FC<PromptEditorProps> = ({
               </span>
             )}
           </div>
-          <span className="header-subtitle">{subtitle}</span>
         </div>
 
         <div className="header-actions">
@@ -196,20 +183,6 @@ export const PromptEditor: React.FC<PromptEditorProps> = ({
           >
             {isPublishing ? "Publishing..." : "Publish Changes"}
           </button>
-        </div>
-      </div>
-
-      {/* Interpolated Placeholders Banner: Sized to content */}
-      <div className="prompt-tips-banner">
-        <span style={{ fontSize: "11px", color: "var(--text-faint)", textTransform: "uppercase", letterSpacing: "0.5px" }}>
-          Interpolated:
-        </span>
-        <div style={{ display: "inline-flex", gap: "6px", alignItems: "center" }}>
-          {placeholderChips.map((chip) => (
-            <span key={chip} className="placeholder-chip">
-              {chip}
-            </span>
-          ))}
         </div>
       </div>
 

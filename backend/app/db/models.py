@@ -73,3 +73,20 @@ class AppSetting(Base):
     value: Mapped[Any] = mapped_column(
         JSON().with_variant(JSONB, "postgresql"), nullable=False
     )
+
+class Interest(Base):
+    __tablename__ = "interests"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    name: Mapped[str] = mapped_column(String(100), nullable=False)
+    prompt_text: Mapped[str] = mapped_column(Text, nullable=False)
+    draft_prompt_text: Mapped[str | None] = mapped_column(Text, nullable=True)
+    has_draft_changes: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
+    created_at: Mapped[datetime.datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), nullable=False
+    )
+    updated_at: Mapped[datetime.datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), onupdate=func.now()
+    )
+

@@ -39,3 +39,27 @@ class RatingTagResponse(BaseModel):
     created_at: datetime.datetime
 
     model_config = {"from_attributes": True}
+
+class InterestResponse(BaseModel):
+    id: int
+    name: str
+    prompt_text: str
+    draft_prompt_text: str | None
+    has_draft_changes: bool
+    is_active: bool
+    created_at: datetime.datetime
+    updated_at: datetime.datetime | None
+
+    model_config = {"from_attributes": True}
+
+class CreateInterestRequest(BaseModel):
+    name: str
+    prompt_text: str = ""
+
+class UpdateInterestDraftRequest(BaseModel):
+    name: str | None = None
+    draft_prompt_text: str | None = None
+
+class ToggleInterestRequest(BaseModel):
+    is_active: bool
+

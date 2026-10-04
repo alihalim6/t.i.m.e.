@@ -10,7 +10,7 @@ from app.api.schemas import (
     SnapshotResponse,
     UpdateDraftRequest,
 )
-from app.db.models import GlobalPrompt, PromptSnapshot, RatingTag, ScoringPrompt
+from app.db.models import GlobalPrompt, PromptSnapshot, RatingTag, ScoringPrompt, Interest
 from app.db.session import get_db
 
 router = APIRouter(prefix="/api", tags=["prompts"])
@@ -129,11 +129,27 @@ async def publish_prompts(db: AsyncSession = Depends(get_db)):
 
     published_at = datetime.datetime.now(datetime.timezone.utc)
 
+    # Snapshot active interests and publish pending drafts
+    interests_res = await db.execute(select(Interest).order_by(Interest.id))
+    all_interests = interests_res.scalars().all()
+    interest_snapshots = []
+    for interest in all_interests:
+        if interest.draft_prompt_text is not None:
+            interest.prompt_text = interest.draft_prompt_text
+        interest.has_draft_changes = False
+        if interest.is_active:
+            interest_snapshots.append({
+                "id": interest.id,
+                "name": interest.name,
+                "prompt_text": interest.prompt_text,
+                "is_active": interest.is_active,
+            })
+
     snapshot = PromptSnapshot(
         version_number=new_version,
         global_prompt_text=final_base_text,
         scoring_prompt_text=final_scoring_text,
-        interest_prompts_json=[],
+        interest_prompts_json=interest_snapshots,
         published_at=published_at,
     )
     db.add(snapshot)
